@@ -1,0 +1,347 @@
+---
+title: "BDA Coursework"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Question 1
+
+1. Statistical learning methods (10% | 20%)
+For each of parts (a) through (d), indicate whether we would generally expect the performance of a flexible
+statistical learning method to be better or worse than an inflexible method. Justify your answer.
+(a) The sample size n is extremely large, and the number of predictors p is small.
+(b) The number of predictors p is extremely large, and the number of observations n is small.
+(c) The relationship between the predictors and response is highly non-linear.
+(d) The variance of the error terms, i.e. ??
+2 = Var(), is extremely high
+
+
+### Notes
+
+Recall that a flexible statistical learning method gives less bias as it is more complex. The curve fitted is less smooth and more engineered to fit the training data being tested.
+
+This means a greater variance for more flexible methods, in other words, if the same function was applied to a different training set, the estimated result would vary more
+
+ <!-- ![alt text](https://pseudotitle.files.wordpress.com/2016/12/bias-variance-decomposition.png) -->
+
+(a) The sample size n is extremely large, and the number of predictors p is small.
+
+Due to the extremely large sample size, overfitting is less likely to be a problem, so the penalty of using a flexible model is reduced. As a result I would use a more flexible model. When thinking about the Bias/Variance trade-off, a flexible model's bias won't be too high
+
+(b) The number of predictors p is extremely large, and the number of observations n is small.
+
+Overfitting will likely be a problem if the number of observations is small, so an inflexible model would be a better choice.
+
+(c) The relationship between the predictors and response is highly non-linear.
+
+(d) The variance of the error terms, i.e. ??
+
+
+some answers from 
+
+http://masterr.org/da/when-does-a-flexible-model-beat-an-inflexible-one-and-vice-versa/
+
+# Question 2
+
+2. Descriptive analysis (10% | 20%)
+In a higher educational institution the comprehensive applied mathematics exam is comprised of two parts.
+On the first day, 20 students took the exam, the results of which are presented below:
+Oral exam results: 4, 1, 4, 5, 3, 2, 3, 4, 3, 5, 2, 2, 4, 3, 5, 5, 1, 1, 1, 2.
+Written exam results: 2, 3, 1, 4, 2, 5, 3, 1, 2, 1, 2, 2, 1, 1, 2, 3, 1, 2, 3, 4.
+(a) Use R to calculate the mean, the mode, the median, the variance and the standard deviation of the
+oral and written exams separately and together as well.
+(b) Find the covariance and correlation between the oral and written exam scores.
+(c) Is there a positive or negative or no correlation between the two?
+(d) Is there causation between the two? Justify your answers
+
+
+Column 1  |  Columne 2
+------------------------
+data 1    |    data 2 
+data 3    |    data 4
+
+```{r}
+oral.results <- c(4,1,4,5,3,2,3,4,3,5,2,2,4,3,5,5,1,1,1,2)
+written.results <- c(2,3,1,4,2,5,3,1,2,1,2,2,1,1,2,3,1,2,3,4)
+combined.results <- c(oral.results,written.results)
+mean(oral.results)
+mean(written.results)
+mean(combined.results)
+
+summary(combined.results,oral.results,written.results)
+```
+Create function to find the mode
+
+```{r}
+Custom.Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+```
+
+
+
+*Data* | Mean | Mode | Median | Variance | Standard Deviation
+------------- | -------------  | ------------- | -------------  | ------------- | -------------
+**Oral** | `r mean(oral.results)` | `r Custom.Mode(oral.results)` | `r median(oral.results)` |`r var(oral.results)` | `r sd(oral.results)`
+**Written** | `r mean(written.results)` | `r Custom.Mode(written.results)` | `r median(written.results)` |`r var(written.results)` | `r sd(written.results)`
+**Total** |`r mean(combined.results)`|`r Custom.Mode(combined.results)` | `r median(combined.results)` | `r var(combined.results)` | `r sd(combined.results)`
+
+
+**(b) Find the covariance and correlation between the oral and written exam scores.**
+
+```{r}
+
+cov(oral.results,written.results)
+cor(oral.results,written.results)
+
+```
+
+
+**(c) Is there a positive or negative or no correlation between the two?**
+
+There is a small negative correlation of `r cor(oral.results,written.results)` between the two. However, because it is such a small value it is unlikely to be statistically significant
+
+**(d) Is there causation between the two? Justify your answers**
+
+Covariance measures the degree of linkage between the oral and written results.
+
+The nature of the dataset means that one would think causation would be likely, however the low correlation seems to suggest otherwise. Another interesting way to look at the data could be to dig deper into those students who scored marks at the extreme ends of the data set (ie. those scoring 5 and those scoring 1). Although we don't actually know what the maximum or minimum possible mark is in the test. Of the 8 students in the oral results who received the class-high or class-low mark of 5 or 1. Only one of them recevies the same mark in the written results. In an exam which has seemingly so few questions, I would have expected more correlation (and thus causation), especially at either end of the results spectrum.
+
+In fact, of the 4 students who scored 5 in the oral results, the mean for their corresponding written results is just 2.5, while the 4 who scored lowest in the oral results, have a corresponding mean just 0.25 lower of 2.25. This seems to indicate no matter how good or bad you are in the oral section, it has very little impact on the writen section.
+
+One thing we could say is that the written exam seems to have been harder on the whole.
+
+# Question 3
+
+3. Descriptive analysis (10% | 0%)
+This exercise involves the Auto data set studied in the class. Make sure that the missing values have been
+removed from the data.
+(a) Which of the predictors are quantitative, and which are qualitative?
+(b) What is the range of each quantitative predictor? You can answer this using the range() function.
+(c) What is the mean and standard deviation of each quantitative predictor?
+(d) Now remove the 10th through 85th observations. What is the range, mean, and standard deviation of
+each predictor in the subset of the data that remains?
+(e) Using the full data set, investigate the predictors graphically, using scatterplots or other tools of your
+choice. Create some plots highlighting the relationships among the predictors. Comment on your
+findings.
+(f) Suppose that we wish to predict gas mileage (mpg) on the basis of the other variables. Do your plots
+suggest that any of the other variables might be useful in predicting mpg? Justify your answer.
+
+
+```{r}
+library(ISLR)
+
+summary(Auto)
+
+colnames(Auto)
+
+lapply(Auto, class)
+```
+
+**(a) Which of the predictors are quantitative, and which are qualitative?**
+
+Doing lapply() shows Name as non-numeric. If we look through the other columns, it seems origin is a category
+
+mpg -> Quantitative -> Numerical -> Continuous
+cylinders -> Quantitative -> Numerical -> Discrete
+displacement -> Quantitative -> Numerical -> Continuous
+horsepower -> Quantitative -> Numerical -> Continuous
+weight -> Quantitative -> Numerical -> Continuous
+acceleration -> Quantitative -> Numerical -> Continuous
+year -> Qualitative -> Numerical -> Ordinal
+origin -> Qualitative -> Numerical -> Nominal
+name -> Qualitative -> Non-numerical -> 
+
+```{r}
+columns.qualitative <- colnames(Auto)
+
+```
+
+**(b) What is the range of each quantitative predictor? You can answer this using the range() function.**
+
+```{r}
+
+range(Auto$mpg)
+range(Auto$cylinders)
+```
+
+MPG = `r range(Auto$mpg)`
+Cylinders = `r range(Auto$cylinders)`
+Displacement = `r range(Auto$displacement)`
+
+**(c) What is the mean and standard deviation of each quantitative predictor?**
+
+MPG = `r mean(Auto$mpg)`
+Cylinders = `r mean(Auto$cylinders)`
+Displacement = `r mean(Auto$displacement)`
+
+MPG = `r sd(Auto$mpg)`
+Cylinders = `r sd(Auto$cylinders)`
+Displacement = `r sd(Auto$displacement)`
+
+**(d) Now remove the 10th through 85th observations. What is the range, mean, and standard deviation of
+each predictor in the subset of the data that remains?**
+
+```{r}
+#lapply(Auto[-(10:85), !cols.qlt], function(x){ c('mean'=mean(x), 'sd'=sd(x))})
+```
+
+Refer to https://rstudio-pubs-static.s3.amazonaws.com/210620_261565168ed94a8191b5ed04d434f709.html for Q 3
+
+# Question 4
+
+4. Linear regression (20% | 20%)
+This question involves the use of simple linear regression on the Auto data set.
+**(a) Use the lm() function to perform a simple linear regression with mpg as the response and horsepower as the predictor. Use the summary() function to print the results.**
+
+```{r}
+lm.fit <- lm(Auto$mpg~Auto$horsepower)
+summary(lm.fit)
+
+```
+
+**Comment on the output. For example:**
+**i. Is there a relationship between the predictor and the response?**
+
+
+ii. How strong is the relationship between the predictor and the response?
+iii. Is the relationship between the predictor and the response positive or negative?
+iv. What is the predicted mpg associated with a horsepower of 98? What are the associated 95% confidence
+and prediction intervals?
+**(b) Plot the response and the predictor. Use the abline() function to display the least squares regression line.**
+
+```{r}
+
+plot(Auto$horsepower, Auto$mpg,
+xlab ="horsepower", ylab = "mpg",
+main = "Plot of horsepower vs mpg")
+abline(lm.fit)
+
+
+```
+
+
+(c) Plot the 95% confidence interval and prediction interval in the same plot as (b) using different colours and legends.
+
+```{r}
+plot(Auto$horsepower, Auto$mpg,xlab="horsepower", ylab = "mpg",main = "Confidence intervals and prediction intervals")
+abline(lm.fit)
+p_conf <- predict(lm.fit,Auto,interval="confidence")
+p_pred <- predict(lm.fit,Auto,interval="prediction")
+lines(Auto$horsepower,p_conf[,"lwr"],col="red", type="b",pch="+")
+lines(Auto$horsepower,p_conf[,"upr"],col="red", type="b",pch="+")
+lines(Auto$horsepower,p_pred[,"upr"],col="blue", type="b",pch="*")
+lines(Auto$horsepower,p_pred[,"lwr"],col="blue",type="b",pch="*")
+legend("bottomright",
+pch=c("+","*"),
+col=c("red","blue"),
+legend = c("confidence","prediction"))
+
+```
+
+
+# Question 5
+
+5. Logistic regression (10% | 20%)
+**Using the Boston data set, fit classification models in order to predict whether a given suburb has a crime rate above or below the median. Explore logistic regression models using various subsets of the predictors.Describe your findings**
+
+```{r}
+library(MASS)
+attach(Boston)
+
+#Data Exploration
+
+summary(Boston)
+pairs(Boston)
+
+
+Boston$crime.classification <- 0
+Boston$crime.classification[crim > median(crim)] <- 1
+
+Boston$crime.classification <- factor(Boston$crime.classification)
+table(Boston$crime.classification)
+Boston <- Boston[-drop(1)]
+summary(Boston)
+```
+
+Create a model
+
+```{r}
+
+glm.crime.fit <- glm(crime.classification ~ zn + indus + chas + nox + rm + age + dis + rad + tax + ptratio + black + lstat + medv,data = Boston,family = "binomial")
+
+summary(glm.crime.fit)
+
+```
+
+# Question 6
+
+6. Resampling methods (20% | 0%)
+Suppose that we use some statistical learning method to make a prediction for the response Y for a particular
+value of the predictor X. Carefully describe how we might estimate the standard deviation of our prediction.
+
+# Question 7
+
+7. Resampling methods (20% | 20%)
+We will now perform cross-validation on a simulated data set.
+(a) Generate a simulated data set as follows:
+set.seed(500)
+y = rnorm(500)
+x = 4 - rnorm(500)
+y = x - 2*x^2 + 3*x^4 + rnorm(500)
+In this data set, what is n and what is p? Write out the model used to generate the data in equation form.
+
+```{r}
+set.seed(500)
+y = rnorm(500)
+x = 4 - rnorm(500)
+y = x - 2*x^2 + 3*x^4 + rnorm(500)
+
+```
+
+**(b) Create a scatterplot of X against Y. Comment on what you find.**
+
+```{r}
+
+plot(x,y)
+
+```
+
+Looks exponential
+
+
+**(c) Set the seed to be 23, and then compute the LOOCV and 10-fold CV errors that result from fitting the following four models using least squares:
+i. Y = ??0 + ??1X + 
+ii. Y = ??0 + ??1X + ??2X2 + 
+iii. Y = ??0 + ??1X + ??2X2 + ??3X3 + 
+iv. Y = ??0 + ??1X + ??2X2 + ??3X3 + ??4X4 + .
+Note you may find it helpful to use the data.frame() function to create a single data set containing both X and Y.**
+
+```{r}
+set.seed(23)
+
+Q7data <- data.frame(x,y)
+
+#i. Y = ??0 + ??1X +  ---> Use linear regression
+
+glm.fit <- glm(y~x,data=Q7data)
+
+library(boot)
+
+cv.err <- cv.glm(Q7data,glm.fit)
+
+cv.err$delta
+```
+
+(d) Repeat (c) using random seed 46, and report your results. Are your results the same as what you got
+in (c)? Why?
+(e) Which of the models in (c) had the smallest LOOCV and 10-fold CV error? Is this what you expected?
+Explain your answer.
+(f) Comment on the statistical significance of the coefficient estimates that results from fitting each of
+the models in (c) using least squares. Do these results agree with the conclusions drawn based on the
+cross-validation results?
